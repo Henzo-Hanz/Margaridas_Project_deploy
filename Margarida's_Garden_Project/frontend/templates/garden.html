@@ -1,0 +1,185 @@
+{% extends "base.html" %}
+
+{% block title %}Meu Jardim - Margarida's Garden{% endblock %}
+
+{% block content %}
+<div class="garden-page">
+  <div class="garden-header">
+    <h1>🌷 Meu Jardim de Senhas</h1>
+    <div>
+      <button id="btn-add" class="btn-garden">+ Nova Senha</button>
+      <button type="button" class="logout-btn" onclick="clearToken(); window.location.href='/';" style="margin-left: 0.5rem;">Sair</button>
+    </div>
+  </div>
+
+  <div id="credentials-list" class="credentials-list">
+    <p id="empty-msg" class="hidden">Nenhuma senha cadastrada. Clique em "Nova Senha" para adicionar.</p>
+  </div>
+</div>
+
+<!-- Modal Adicionar/Editar -->
+<div id="modal-form" class="modal-overlay hidden">
+  <div class="modal">
+    <h2 id="modal-title">Nova Senha</h2>
+    <form id="credential-form">
+      <input type="hidden" id="credential-id">
+      <div class="form-group">
+        <label for="service_name">Serviço (ex: Gmail, Netflix)</label>
+        <input type="text" id="service_name" required>
+      </div>
+      <div class="form-group">
+        <label for="username">Usuário / Email</label>
+        <input type="text" id="username" placeholder="Opcional">
+      </div>
+      <div class="form-group">
+        <label for="password">Senha</label>
+        <input type="password" id="password" required>
+      </div>
+      <div class="form-group">
+        <label for="notes">Observações</label>
+        <input type="text" id="notes" placeholder="Opcional">
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn-small" id="btn-cancel">Cancelar</button>
+        <button type="submit" class="btn-submit">Salvar</button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="/static/js/auth.js"></script>
+<script src="/static/js/credentials.js"></script>
+<script>
+  if (!isAuthenticated()) {
+    window.location.href = '/login';
+  }
+
+  const listEl = document.getElementById('credentials-list');
+  const emptyMsg = document.getElementById('empty-msg');
+  const modal = document.getElementById('modal-form');
+  const form = document.getElementById('credential-form');
+
+  function renderCredentials(creds) {
+    listEl.querySelectorAll('.credential-card').forEach(c => c.remove());
+    emptyMsg.classList.toggle('hidden', creds.length > 0);
+
+    creds.forEach(c => {
+      const card = document.createElement('div');
+      card.className = 'credential-card';
+      card.innerHTML = `
+        <div class="credential-info">
+          <h3>${escapeHtml(c.service_name)}</h3>
+          ${c.username ? `<span class="username">${escapeHtml(c.username)}</span>` : ''}
+          <div><code class="pwd-display">${c.password}</code> <button class="btn-small btn-show-pwd" data-id="${c.id}">Ver</button></div>
+        </div>
+        <div class="credential-actions">
+          <button class="btn-small btn-edit" data-id="${c.id}">Editar</button>
+          <button class="btn-small btn-delete" data-id="${c.id}">Excluir</button>
+        </div>
+      `;
+      listEl.appendChild(card);
+    });
+
+    listEl.querySelectorAll('.btn-edit').forEach(btn => {
+      btn.onclick = () => openEditModal(parseInt(btn.dataset.id));
+    });
+    listEl.querySelectorAll('.btn-delete').forEach(btn => {
+      btn.onclick = () => deleteCred(parseInt(btn.dataset.id));
+    });
+    listEl.querySelectorAll('.btn-show-pwd').forEach(btn => {
+      btn.onclick = () => togglePassword(btn);
+    });
+  }
+
+  function escapeHtml(s) {
+    const div = document.createElement('div');
+    div.textContent = s;
+    return div.innerHTML;
+  }
+
+  async function togglePassword(btn) {
+    const card = btn.closest('.credential-card');
+    const pwdEl = card.querySelector('.pwd-display');
+    if (pwdEl.textContent === '••••••••') {
+      const res = await apiRequest(`/passwords/${btn.dataset.id}`);
+      const data = await res.json();
+      pwdEl.textContent = data.password;
+      btn.textContent = 'Ocultar';
+    } else {
+      pwdEl.textContent = '••••••••';
+      btn.textContent = 'Ver';
+    }
+  }
+
+  async function loadCredentials() {
+    try {
+      const creds = await listCredentials(false);
+      renderCredentials(creds);
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  function openAddModal() {
+    document.getElementById('modal-title').textContent = 'Nova Senha';
+    document.getElementById('credential-id').value = '';
+    form.reset();
+    modal.classList.remove('hidden');
+  }
+
+  async function openEditModal(id) {
+    const res = await apiRequest(`/passwords/${id}`);
+    const c = await res.json();
+    document.getElementById('modal-title').textContent = 'Editar Senha';
+    document.getElementById('credential-id').value = c.id;
+    document.getElementById('service_name').value = c.service_name;
+    document.getElementById('username').value = c.username || '';
+    document.getElementById('password').value = c.password;
+    document.getElementById('notes').value = c.notes || '';
+    modal.classList.remove('hidden');
+  }
+
+  function closeModal() {
+    modal.classList.add('hidden');
+  }
+
+  async function deleteCred(id) {
+    if (!confirm('Excluir esta senha?')) return;
+    try {
+      await deleteCredential(id);
+      loadCredentials();
+    } catch (e) {
+      alert(e.message);
+    }
+  }
+
+  form.onsubmit = async (e) => {
+    e.preventDefault();
+    const id = document.getElementById('credential-id').value;
+    const data = {
+      service_name: document.getElementById('service_name').value,
+      username: document.getElementById('username').value || null,
+      password: document.getElementById('password').value,
+      notes: document.getElementById('notes').value || null,
+    };
+    try {
+      if (id) {
+        await updateCredential(parseInt(id), data);
+      } else {
+        await createCredential(data);
+      }
+      closeModal();
+      loadCredentials();
+    } catch (e) {
+      alert(e.message);
+    }
+  };
+
+  document.getElementById('btn-add').onclick = openAddModal;
+  document.getElementById('btn-cancel').onclick = closeModal;
+
+  loadCredentials();
+</script>
+{% endblock %}

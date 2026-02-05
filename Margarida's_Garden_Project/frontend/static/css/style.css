@@ -1,0 +1,477 @@
+/* Margarida's Garden - Estilos */
+
+:root {
+  /* Pastel sky */
+  --sky-blue: #F0F9FC;
+  --sky-light: #E0F2F7;
+  /* Pastel grass */
+  --grass-green: #5FDD4D;
+  --grass-dark: #4BA639;
+  /* Saturated flowers */
+  --flower-pink: #FF69B4;
+  --flower-yellow: #FFD700;
+  --flower-purple: #9966CC;
+  --flower-rose: #FF1493;
+  --flower-peach: #FF7F50;
+  --flower-lavender: #B19CD9;
+  --text-dark: #4a4a4a;
+  --shadow: rgba(0, 0, 0, 0.08);
+  --outline: rgba(0, 0, 0, 0.1);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Segoe UI', 'Georgia', serif;
+  overflow-x: hidden;
+  min-height: 100vh;
+  background: linear-gradient(180deg, var(--sky-blue) 0%, var(--sky-light) 60%, #D8F0D0 90%, var(--grass-green) 100%);
+}
+
+/* Landing Page */
+.landing-container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  padding: 2rem;
+}
+
+.greeting {
+  font-size: clamp(1.5rem, 4vw, 2.5rem);
+  color: var(--text-dark);
+  text-align: center;
+  z-index: 10;
+  margin-bottom: 2rem;
+  font-weight: 400;
+  letter-spacing: 0.02em;
+}
+
+.greeting .user-name {
+  font-weight: 600;
+  color: #6B9B6B;
+}
+
+/* Chão verde pastel */
+.ground {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 28vh;
+  background: linear-gradient(180deg, #C5E8BD 0%, var(--grass-green) 40%, var(--grass-dark) 100%);
+  border-radius: 50% 50% 0 0 / 15% 15% 0 0;
+  z-index: 1;
+}
+
+/* Flores - design simplificado */
+.flowers-container {
+  position: absolute;
+  bottom: 4vh;
+  left: 0;
+  right: 0;
+  height: 22vh;
+  z-index: 5;
+  display: flex;
+  justify-content: space-around;
+  align-items: flex-end;
+  padding: 0 8%;
+}
+
+.flower {
+  width: 57px;
+  height: 85px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  animation: sway 3.4s ease-in-out infinite;
+}
+
+.flower:nth-child(1) { animation-delay: 0s; }
+.flower:nth-child(2) { animation-delay: 0.34s; }
+.flower:nth-child(3) { animation-delay: 0.68s; }
+.flower:nth-child(4) { animation-delay: 1.02s; }
+.flower:nth-child(5) { animation-delay: 1.36s; }
+.flower:nth-child(6) { animation-delay: 1.7s; }
+.flower:nth-child(7) { animation-delay: 2.04s; }
+
+@keyframes sway {
+  0%, 100% { transform: rotate(-4deg); }
+  50% { transform: rotate(4deg); }
+}
+
+.flower-head {
+  position: relative;
+  width: 47px;
+  height: 47px;
+  flex-shrink: 0;
+}
+
+/* Pétalas da margarida - 5 pétalas em círculo */
+.flower-head .petal {
+  position: absolute;
+  width: 19px;
+  height: 35px;
+  top: 50%;
+  left: 50%;
+  margin-left: -9.5px;
+  margin-top: -17.5px;
+  border-radius: 50% 50% 50% 0;
+  transform-origin: center center;
+  box-shadow: 0 0 0 1px var(--outline);
+  animation: petalGrowth 5.1s ease-in-out infinite;
+  animation-fill-mode: both;
+}
+
+.flower-head .petal.p1 { 
+  transform: rotate(0deg);
+  animation-delay: 0s;
+}
+.flower-head .petal.p2 { 
+  transform: rotate(72deg);
+  animation-delay: 0.34s;
+}
+.flower-head .petal.p3 { 
+  transform: rotate(144deg);
+  animation-delay: 0.68s;
+}
+.flower-head .petal.p4 { 
+  transform: rotate(216deg);
+  animation-delay: 1.02s;
+}
+.flower-head .petal.p5 { 
+  transform: rotate(288deg);
+  animation-delay: 1.36s;
+}
+
+@keyframes petalGrowth {
+  0% {
+    /* Pétala em repouso - ligeiramente encolhida */
+    opacity: 0.85;
+    filter: saturate(0.95) brightness(0.95);
+    transform: rotate(var(--petal-base)) scaleX(0.7) scaleY(0.85);
+  }
+  25% {
+    /* Começando a se abrir e brilhar */
+    opacity: 0.92;
+    filter: saturate(0.98) brightness(0.98);
+    transform: rotate(var(--petal-base)) scaleX(0.85) scaleY(0.92);
+  }
+  50% {
+    /* Pétala totalmente aberta e vibrante */
+    opacity: 1;
+    filter: saturate(1) brightness(1);
+    transform: rotate(var(--petal-base)) scaleX(1) scaleY(1);
+  }
+  75% {
+    /* Começando a se repouser */
+    opacity: 0.92;
+    filter: saturate(0.98) brightness(0.98);
+    transform: rotate(var(--petal-base)) scaleX(0.85) scaleY(0.92);
+  }
+  100% {
+    /* Volta ao estado de repouso */
+    opacity: 0.85;
+    filter: saturate(0.95) brightness(0.95);
+    transform: rotate(var(--petal-base)) scaleX(0.7) scaleY(0.85);
+  }
+}
+
+.flower-head .petal.p1 { --petal-base: 0deg; }
+.flower-head .petal.p2 { --petal-base: 72deg; }
+.flower-head .petal.p3 { --petal-base: 144deg; }
+.flower-head .petal.p4 { --petal-base: 216deg; }
+.flower-head .petal.p5 { --petal-base: 288deg; }
+
+.flower-head.pink .petal { background: var(--flower-pink); }
+.flower-head.yellow .petal { background: var(--flower-yellow); }
+.flower-head.purple .petal { background: var(--flower-purple); }
+.flower-head.rose .petal { background: var(--flower-rose); }
+.flower-head.peach .petal { background: var(--flower-peach); }
+.flower-head.lavender .petal { background: var(--flower-lavender); }
+
+.flower-center {
+  position: absolute;
+  width: 13px;
+  height: 13px;
+  top: 50%;
+  left: 50%;
+  margin-left: -6.5px;
+  margin-top: -6.5px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 0 0 1px var(--outline);
+  z-index: 1;
+}
+
+.flower-stem {
+  width: 4px;
+  height: 55px;
+  background: linear-gradient(90deg, rgba(139, 198, 139, 0.7), rgba(168, 213, 162, 0.95));
+  border-radius: 2px;
+  margin-top: -2px;
+  box-shadow: 0 0 0 1px var(--outline);
+}
+
+/* Botões e links */
+.btn-garden {
+  display: inline-block;
+  padding: 0.75rem 1.5rem;
+  background: var(--grass-green);
+  color: white;
+  text-decoration: none;
+  border-radius: 2rem;
+  font-weight: 500;
+  margin-top: 1rem;
+  transition: background 0.3s, transform 0.2s;
+  box-shadow: 0 4px 15px rgba(95, 221, 77, 0.3);
+  border: none;
+}
+
+.btn-garden:hover {
+  background: var(--grass-dark);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(75, 166, 57, 0.4);
+}
+
+/* Login Page */
+.login-container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  background: linear-gradient(135deg, #F0F9FC 0%, rgba(255, 215, 0, 0.05) 50%, #E8F5E9 100%);
+}
+
+.login-card {
+  background: white;
+  padding: 2.5rem;
+  border-radius: 1rem;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 400px;
+  border: 2px solid rgba(255, 107, 180, 0.15);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.98), rgba(255, 215, 0, 0.02));
+}
+
+.login-card h1 {
+  color: var(--grass-dark);
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+.form-group {
+  margin-bottom: 1.25rem;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  color: var(--text-dark);
+  font-weight: 500;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #ddd;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+}
+
+.form-group input:focus {
+  outline: none;
+  border-color: var(--flower-pink);
+  box-shadow: 0 0 0 2px rgba(255, 105, 180, 0.15);
+}
+
+.btn-submit {
+  width: 100%;
+  padding: 0.75rem;
+  background: var(--grass-green);
+  color: white;
+  border: none;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.3s, box-shadow 0.3s;
+  box-shadow: 0 4px 12px rgba(95, 221, 77, 0.25);
+}
+
+.btn-submit:hover {
+  background: var(--grass-dark);
+  box-shadow: 0 6px 16px rgba(75, 166, 57, 0.35);
+}
+
+.error-msg {
+  color: #c0392b;
+  font-size: 0.9rem;
+  margin-top: 0.5rem;
+}
+
+/* Garden Page - Gerenciamento */
+.garden-page {
+  min-height: 100vh;
+  padding: 2rem;
+  background: linear-gradient(135deg, #F0F9FC 0%, rgba(185, 28, 211, 0.03) 50%, #F5F5F5 100%);
+}
+
+.garden-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.garden-header h1 {
+  color: var(--grass-dark);
+}
+
+.credentials-list {
+  display: grid;
+  gap: 1rem;
+  max-width: 800px;
+}
+
+.credential-card {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.99), rgba(255, 215, 0, 0.02));
+  padding: 1.25rem;
+  border-radius: 0.75rem;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+  border-left: 4px solid var(--flower-pink);
+  transition: box-shadow 0.3s, border-color 0.3s;
+}
+
+.credential-card:nth-child(even) {
+  border-left-color: var(--flower-yellow);
+}
+
+.credential-card:nth-child(3n) {
+  border-left-color: var(--flower-purple);
+}
+
+.credential-card:hover {
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+}
+
+.credential-info h3 {
+  color: var(--grass-dark);
+  margin-bottom: 0.25rem;
+}
+
+.credential-info .username {
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.credential-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.btn-small {
+  padding: 0.4rem 0.8rem;
+  border: none;
+  border-radius: 0.4rem;
+  cursor: pointer;
+  font-size: 0.85rem;
+  transition: opacity 0.2s, transform 0.2s;
+}
+
+.btn-small:hover {
+  opacity: 0.85;
+  transform: translateY(-1px);
+}
+
+.btn-edit {
+  background: linear-gradient(135deg, #B19CD9, #9966CC);
+  color: white;
+  font-weight: 500;
+}
+
+.btn-delete {
+  background: linear-gradient(135deg, #FF69B4, #FF1493);
+  color: white;
+  font-weight: 500;
+}
+
+.btn-show-pwd {
+  background: linear-gradient(135deg, var(--grass-green), var(--grass-dark));
+  color: white;
+  font-weight: 500;
+}
+
+/* Modal */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0,0,0,0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 1rem;
+  backdrop-filter: blur(2px);
+}
+
+.modal {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.99), rgba(255, 215, 0, 0.02));
+  padding: 2rem;
+  border-radius: 1rem;
+  width: 100%;
+  max-width: 450px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+  border: 2px solid rgba(185, 28, 211, 0.15);
+}
+
+.modal h2 {
+  margin-bottom: 1.5rem;
+  color: var(--grass-dark);
+}
+
+.modal-actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 1.5rem;
+  justify-content: flex-end;
+}
+
+.hidden {
+  display: none !important;
+}
+
+.logout-btn {
+  background: #90A4AE;
+  color: white;
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  text-decoration: none;
+  font-size: 0.9rem;
+  transition: background 0.3s, box-shadow 0.3s;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.logout-btn:hover {
+  background: #78909C;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}

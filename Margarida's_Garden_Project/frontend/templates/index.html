@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block title %}Margarida's Garden - Seu jardim de senhas{% endblock %}
+
+{% block content %}
+<div class="landing-container">
+  <h1 class="greeting">
+    Olá <span class="user-name">{{ user_name }}</span>, seja bem-vinda ao seu jardim de senhas!
+  </h1>
+  <a href="/login" class="btn-garden">Entrar no jardim</a>
+
+  <div class="ground"></div>
+
+  <div class="flowers-container">
+    {% for color in flower_colors %}
+    <div class="flower">
+      <div class="flower-head {{ color }}">
+        <div class="petal p1"></div>
+        <div class="petal p2"></div>
+        <div class="petal p3"></div>
+        <div class="petal p4"></div>
+        <div class="petal p5"></div>
+        <div class="flower-center"></div>
+      </div>
+      <div class="flower-stem"></div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{% endblock %}
