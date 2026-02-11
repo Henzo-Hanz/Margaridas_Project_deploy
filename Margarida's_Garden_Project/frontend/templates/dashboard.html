@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+
+{% block title %}Painel - Margarida's Garden & Treasury{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+  <div class="dashboard-content">
+    <h1 class="dashboard-title">Bem-vindo, Margarida! 🌸</h1>
+    <p class="dashboard-subtitle">Escolha um dos nossos serviços</p>
+    
+    <div class="apps-grid">
+      <!-- Margarida's Garden -->
+      <div class="app-card garden-card" onclick="navigateTo('/garden')">
+        <div class="app-icon">🌷</div>
+        <h2>Margarida's Garden</h2>
+        <p class="app-description">Gerenciador de senhas seguro e intuitivo</p>
+        <p class="app-features">
+          • Armazene senhas criptografadas<br>
+          • Organize por serviço<br>
+          • Acesso rápido e seguro
+        </p>
+        <button class="app-button garden-btn">Acessar Jardim →</button>
+      </div>
+
+      <!-- Margarida's Treasury -->
+      <div class="app-card treasury-card" onclick="navigateTo('/treasury')">
+        <div class="app-icon">💎</div>
+        <h2>Margarida's Treasury</h2>
+        <p class="app-description">Gestor de finanças pessoais completo</p>
+        <p class="app-features">
+          • Controle de despesas e receitas<br>
+          • Análise mensal detalhada<br>
+          • Gráficos e relatórios
+        </p>
+        <button class="app-button treasury-btn">Acessar Tesouro →</button>
+      </div>
+    </div>
+
+    <!-- Quick Stats -->
+    <div class="quick-stats" id="quick-stats" style="display: none;">
+      <div class="stat-box">
+        <span class="stat-label">Despesas (3m)</span>
+        <span class="stat-value" id="expenses-3m">R$ 0,00</span>
+      </div>
+      <div class="stat-box">
+        <span class="stat-label">Receitas (3m)</span>
+        <span class="stat-value" id="incomes-3m">R$ 0,00</span>
+      </div>
+      <div class="stat-box">
+        <span class="stat-label">Balanço (3m)</span>
+        <span class="stat-value" id="balance-3m">R$ 0,00</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Logout Button -->
+  <div class="dashboard-footer">
+    <button onclick="logout()" class="btn-logout">Sair</button>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="/static/js/auth.js"></script>
+<script>
+  // Verificar autenticação
+  if (!isAuthenticated()) {
+    window.location.href = '/login';
+  }
+
+  function navigateTo(path) {
+    window.location.href = path;
+  }
+
+  function logout() {
+    clearToken();
+    window.location.href = '/';
+  }
+
+  // Carregar dados financeiros se quiser mostrar (opcional)
+  async function loadStats() {
+    try {
+      const response = await apiRequest('/treasury/analytics/summary');
+      if (response && response.data) {
+        document.getElementById('quick-stats').style.display = 'grid';
+        document.getElementById('expenses-3m').textContent = `R$ ${response.data.expenses.total_3m.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
+        document.getElementById('incomes-3m').textContent = `R$ ${response.data.incomes.total_3m.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
+        document.getElementById('balance-3m').textContent = `R$ ${response.data.balance.balance_3m.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
+      }
+    } catch (err) {
+      console.error('Erro ao carregar estatísticas:', err);
+    }
+  }
+
+  // Remover a chamada a loadStats por enquanto (pode ser adicionada após implementar melhor)
+  // loadStats();
+</script>
+{% endblock %}

@@ -7,7 +7,7 @@ from app.core.database import Base
 
 
 class User(Base):
-    """Usuário do jardim de senhas."""
+    """Usuário do jardim de senhas e treasury."""
 
     __tablename__ = "users"
 
@@ -19,3 +19,5 @@ class User(Base):
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
 
     credentials = relationship("Credential", back_populates="user", cascade="all, delete-orphan")
+    expenses = relationship("Expense", back_populates="user", cascade="all, delete-orphan")
+    incomes = relationship("Income", back_populates="user", cascade="all, delete-orphan")

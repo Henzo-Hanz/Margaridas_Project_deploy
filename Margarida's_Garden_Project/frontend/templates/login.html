@@ -37,7 +37,7 @@
     try {
       errorEl.classList.add('hidden');
       await login(email, password);
-      window.location.href = '/garden';
+      window.location.href = '/dashboard';
     } catch (err) {
       errorEl.textContent = err.message;
       errorEl.classList.remove('hidden');

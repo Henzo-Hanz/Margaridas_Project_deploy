@@ -1,0 +1,1191 @@
+{% extends "base.html" %}
+
+{% block title %}Margarida's Treasury - Gerenciador de Finanças{% endblock %}
+
+{% block extra_css %}
+<style>
+  .treasury-container {
+    min-height: 100vh;
+    background: linear-gradient(180deg, var(--sky-blue) 0%, var(--sky-light) 60%, #D8F0D0 90%, var(--grass-green) 100%);
+    padding: 2rem 1rem;
+  }
+
+  .treasury-header {
+    max-width: 1200px;
+    margin: 0 auto 2rem;
+    text-align: center;
+    color: var(--text-dark);
+  }
+
+  .treasury-header h1 {
+    font-size: 2.5rem;
+    margin-bottom: 0.5rem;
+    font-weight: 400;
+    letter-spacing: 0.02em;
+  }
+
+  .treasury-nav {
+    max-width: 1200px;
+    margin: 0 auto 2rem;
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .nav-btn {
+    padding: 0.75rem 1.5rem;
+    border: 2px solid var(--grass-green);
+    background: white;
+    color: var(--grass-green);
+    border-radius: 25px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    font-size: 0.95rem;
+  }
+
+  .nav-btn:hover {
+    background: var(--grass-green);
+    color: white;
+    transform: translateY(-2px);
+  }
+
+  .nav-btn.active {
+    background: var(--grass-green);
+    color: white;
+  }
+
+  .treasury-main {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  /* Tabs */
+  .tab-container {
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 4px 6px var(--shadow);
+    overflow: hidden;
+  }
+
+  .tab-buttons {
+    display: flex;
+    border-bottom: 2px solid #f0f0f0;
+    background: #fafafa;
+  }
+
+  .tab-btn {
+    flex: 1;
+    padding: 1rem;
+    border: none;
+    background: transparent;
+    color: var(--text-dark);
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
+    border-bottom: 3px solid transparent;
+  }
+
+  .tab-btn:hover {
+    background: #f5f5f5;
+  }
+
+  .tab-btn.active {
+    color: var(--grass-green);
+    border-bottom-color: var(--grass-green);
+  }
+
+  .tab-content {
+    padding: 2rem;
+    display: none;
+  }
+
+  .tab-content.active {
+    display: block;
+  }
+
+  /* Summary Cards */
+  .summary-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2rem;
+  }
+
+  .summary-card {
+    background: linear-gradient(135deg, var(--sky-light) 0%, #E8F5E9 100%);
+    padding: 1.5rem;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px var(--shadow);
+    border-left: 4px solid var(--grass-green);
+  }
+
+  .summary-card h3 {
+    color: var(--text-dark);
+    font-size: 0.85rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .summary-card .value {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--grass-green);
+  }
+
+  .summary-card.incomes {
+    border-left-color: var(--flower-yellow);
+  }
+
+  .summary-card.incomes .value {
+    color: var(--flower-yellow);
+  }
+
+  .summary-card.balance {
+    border-left-color: var(--flower-pink);
+  }
+
+  .summary-card.balance .value {
+    color: var(--flower-pink);
+  }
+
+  /* Form Styles */
+  .form-container {
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 2px 8px var(--shadow);
+  }
+
+  .form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1rem;
+  }
+
+  .form-group {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .form-group label {
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: var(--text-dark);
+    font-size: 0.9rem;
+  }
+
+  .form-group input,
+  .form-group select,
+  .form-group textarea {
+    padding: 0.75rem;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-family: 'Segoe UI', sans-serif;
+    font-size: 0.95rem;
+    transition: border-color 0.3s ease;
+  }
+
+  .form-group input:focus,
+  .form-group select:focus,
+  .form-group textarea:focus {
+    outline: none;
+    border-color: var(--grass-green);
+    box-shadow: 0 0 0 3px rgba(95, 221, 77, 0.1);
+  }
+
+  .form-buttons {
+    display: flex;
+    gap: 1rem;
+    justify-content: flex-end;
+  }
+
+  .btn-primary {
+    padding: 0.75rem 1.5rem;
+    background: var(--grass-green);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+
+  .btn-primary:hover {
+    background: var(--grass-dark);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(95, 221, 77, 0.3);
+  }
+
+  .btn-secondary {
+    padding: 0.75rem 1.5rem;
+    background: #f0f0f0;
+    color: var(--text-dark);
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+
+  .btn-secondary:hover {
+    background: #e0e0e0;
+  }
+
+  /* Items List */
+  .items-list {
+    display: grid;
+    gap: 1rem;
+  }
+
+  .item-card {
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    border-left: 4px solid var(--grass-green);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 2px 8px var(--shadow);
+    transition: all 0.3s ease;
+  }
+
+  .item-card:hover {
+    transform: translateX(4px);
+    box-shadow: 0 4px 12px var(--shadow);
+  }
+
+  .item-info h4 {
+    color: var(--text-dark);
+    font-size: 1.1rem;
+    margin-bottom: 0.25rem;
+    font-weight: 600;
+  }
+
+  .item-info p {
+    color: #888;
+    font-size: 0.85rem;
+    margin: 0.25rem 0;
+  }
+
+  .item-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--grass-green);
+    text-align: right;
+  }
+
+  .item-actions {
+    display: flex;
+    gap: 0.5rem;
+    margin-left: 1rem;
+  }
+
+  .btn-icon {
+    width: 36px;
+    height: 36px;
+    border: none;
+    background: white;
+    border-radius: 6px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    border: 1px solid #ddd;
+  }
+
+  .btn-icon:hover {
+    background: #f5f5f5;
+  }
+
+  .btn-icon.delete {
+    color: #ff6b6b;
+  }
+
+  .btn-icon.delete:hover {
+    background: #fff0f0;
+  }
+
+  /* Chart Container */
+  .chart-container {
+    position: relative;
+    height: 400px;
+    margin-bottom: 2rem;
+  }
+
+  /* Empty State */
+  .empty-state {
+    text-align: center;
+    padding: 3rem 1rem;
+    color: #999;
+  }
+
+  .empty-state-icon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+  }
+
+  .empty-state p {
+    font-size: 1.1rem;
+    margin-bottom: 1rem;
+  }
+
+  /* Modal */
+  .modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .modal.active {
+    display: flex;
+  }
+
+  .modal-content {
+    background: white;
+    border-radius: 15px;
+    padding: 2rem;
+    max-width: 500px;
+    width: 90%;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+  }
+
+  .modal-header {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--text-dark);
+    margin-bottom: 1.5rem;
+  }
+
+  .modal-close {
+    position: absolute;
+    top: 1.5rem;
+    right: 1.5rem;
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: #999;
+  }
+
+  .modal-close:hover {
+    color: var(--text-dark);
+  }
+
+  /* Top Navigation */
+  .treasury-top-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    background: white;
+    padding: 1rem 1.5rem;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px var(--shadow);
+  }
+
+  .btn-back {
+    padding: 0.5rem 1rem;
+    background: transparent;
+    border: 1px solid var(--grass-green);
+    color: var(--grass-green);
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.3s ease;
+  }
+
+  .btn-back:hover {
+    background: var(--grass-green);
+    color: white;
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .form-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .summary-cards {
+      grid-template-columns: 1fr;
+    }
+
+    .item-card {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    .item-value {
+      text-align: left;
+      margin-top: 1rem;
+    }
+
+    .item-actions {
+      width: 100%;
+      margin-left: 0;
+      margin-top: 1rem;
+    }
+
+    .treasury-header h1 {
+      font-size: 1.8rem;
+    }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="treasury-container">
+  <div class="treasury-top-nav">
+    <button class="btn-back" onclick="window.location.href='/dashboard'">← Voltar</button>
+    <h1 style="margin: 0; color: var(--text-dark); font-weight: 600;">💎 Margarida's Treasury</h1>
+    <button class="btn-back" onclick="logout()">Sair</button>
+  </div>
+
+  <div class="treasury-header">
+    <h1>💎 Seu Tesouro Financeiro</h1>
+    <p style="color: #666; font-size: 1.05rem;">Gerencie suas despesas e receitas com facilidade</p>
+  </div>
+
+  <div class="treasury-main">
+    <!-- Summary Section -->
+    <div class="summary-cards">
+      <div class="summary-card">
+        <h3>Despesas <span id="header-period-label">(últimos 6 meses)</span></h3>
+        <div class="value" id="expenses-total">R$ 0,00</div>
+      </div>
+      <div class="summary-card incomes">
+        <h3>Receitas <span id="header-period-label-2">(últimos 6 meses)</span></h3>
+        <div class="value" id="incomes-total">R$ 0,00</div>
+      </div>
+      <div class="summary-card balance">
+        <h3>Balanço <span id="header-period-label-3">(últimos 6 meses)</span></h3>
+        <div class="value" id="balance-total">R$ 0,00</div>
+      </div>
+    </div>
+
+    <!-- Tabs Container -->
+    <div class="tab-container">
+      <div class="tab-buttons">
+        <button class="tab-btn active" onclick="switchTab('expenses')">📊 Despesas</button>
+        <button class="tab-btn" onclick="switchTab('incomes')">💰 Receitas</button>
+        <button class="tab-btn" onclick="switchTab('analytics')">📈 Análises</button>
+      </div>
+
+      <!-- Expenses Tab -->
+      <div id="expenses-tab" class="tab-content active">
+        <div class="form-container">
+          <h3 style="margin-bottom: 1.5rem; color: var(--text-dark);">Registrar Nova Despesa</h3>
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="expense-name">Descrição</label>
+              <input type="text" id="expense-name" placeholder="Ex: Supermercado">
+            </div>
+            <div class="form-group">
+              <label for="expense-value">Valor</label>
+              <input type="number" id="expense-value" placeholder="0,00" step="0.01" min="0">
+            </div>
+            <div class="form-group">
+              <label for="expense-date">Data</label>
+              <input type="date" id="expense-date">
+            </div>
+            <div class="form-group">
+              <label for="expense-method">Método</label>
+              <select id="expense-method">
+                <option value="card">Cartão</option>
+                <option value="cash">Dinheiro</option>
+                <option value="transfer">Transferência</option>
+                <option value="debit">Débito</option>
+                <option value="pix">Pix</option>
+                <option value="bill">Boleto</option>
+              </select>
+            </div>
+            <div class="form-group" style="grid-column: 1 / -1;">
+              <label for="expense-notes">Notas (opcional)</label>
+              <textarea id="expense-notes" placeholder="Adicione notas..."></textarea>
+            </div>
+          </div>
+          <div class="form-buttons">
+            <button class="btn-secondary" onclick="clearExpenseForm()">Limpar</button>
+            <button class="btn-primary" onclick="saveExpense()">Registrar Despesa</button>
+          </div>
+        </div>
+
+        <h3 style="margin: 2rem 0 1rem; color: var(--text-dark);">Suas Despesas</h3>
+        <div id="expenses-list" class="items-list"></div>
+      </div>
+
+      <!-- Incomes Tab -->
+      <div id="incomes-tab" class="tab-content">
+        <div class="form-container">
+          <h3 style="margin-bottom: 1.5rem; color: var(--text-dark);">Registrar Nova Receita</h3>
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="income-name">Descrição</label>
+              <input type="text" id="income-name" placeholder="Ex: Salário">
+            </div>
+            <div class="form-group">
+              <label for="income-value">Valor</label>
+              <input type="number" id="income-value" placeholder="0,00" step="0.01" min="0">
+            </div>
+            <div class="form-group">
+              <label for="income-date">Data</label>
+              <input type="date" id="income-date">
+            </div>
+            <div class="form-group" style="grid-column: 1 / -1;">
+              <label for="income-notes">Notas (opcional)</label>
+              <textarea id="income-notes" placeholder="Adicione notas..."></textarea>
+            </div>
+          </div>
+          <div class="form-buttons">
+            <button class="btn-secondary" onclick="clearIncomeForm()">Limpar</button>
+            <button class="btn-primary" onclick="saveIncome()">Registrar Receita</button>
+          </div>
+        </div>
+
+        <h3 style="margin: 2rem 0 1rem; color: var(--text-dark);">Suas Receitas</h3>
+        <div id="incomes-list" class="items-list"></div>
+      </div>
+
+      <!-- Analytics Tab -->
+      <div id="analytics-tab" class="tab-content">
+        <!-- Period Selector -->
+        <div style="background: white; padding: 1.5rem; border-radius: 12px; margin-bottom: 2rem; box-shadow: 0 2px 8px var(--shadow);">
+          <h3 style="color: var(--text-dark); margin-bottom: 1rem;">Período de Análise</h3>
+          <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+            <button class="tab-btn" onclick="setPeriod('1m')" id="btn-1m" style="background: #f0f0f0; color: var(--text-dark); border: 2px solid #ddd; padding: 0.5rem 1rem;">Mês atual</button>
+            <button class="tab-btn" onclick="setPeriod('3m')" id="btn-3m" style="background: #f0f0f0; color: var(--text-dark); border: 2px solid #ddd; padding: 0.5rem 1rem;">Últimos 3 meses</button>
+            <button class="tab-btn" onclick="setPeriod('6m')" id="btn-6m" style="background: #f0f0f0; color: var(--text-dark); border: 2px solid #ddd; padding: 0.5rem 1rem; border-color: var(--grass-green) !important; background: #E8F5E9 !important;">Últimos 6 meses</button>
+            <button class="tab-btn" onclick="setPeriod('12m')" id="btn-12m" style="background: #f0f0f0; color: var(--text-dark); border: 2px solid #ddd; padding: 0.5rem 1rem;">Últimos 12 meses</button>
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 2rem; margin-bottom: 2rem;">
+          <div class="summary-card">
+            <h3>Despesas <span id="period-label">(últimos 6 meses)</span></h3>
+            <div class="value" id="analytics-expenses-total">R$ 0,00</div>
+          </div>
+          <div class="summary-card">
+            <h3>Receitas <span id="period-label-2">(últimos 6 meses)</span></h3>
+            <div class="value incomes" id="analytics-incomes-total">R$ 0,00</div>
+          </div>
+          <div class="summary-card balance">
+            <h3>Saldo <span id="period-label-3">(últimos 6 meses)</span></h3>
+            <div class="value" id="analytics-balance-total">R$ 0,00</div>
+          </div>
+        </div>
+
+        <div style="background: white; padding: 2rem; border-radius: 12px; margin-bottom: 2rem; box-shadow: 0 2px 8px var(--shadow);">
+          <h3 style="color: var(--text-dark); margin-bottom: 1.5rem;">Despesas por Método de Pagamento</h3>
+          <div class="chart-container">
+            <canvas id="methodChart"></canvas>
+          </div>
+        </div>
+
+        <div style="background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 2px 8px var(--shadow);">
+          <h3 style="color: var(--text-dark); margin-bottom: 1.5rem;">Despesas vs Receitas (<span id="monthly-period-label">últimos 12 meses</span>)</h3>
+          <div class="chart-container">
+            <canvas id="monthlyChart"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+<script src="/static/js/auth.js"></script>
+<script>
+  // Verificar autenticação
+  if (!isAuthenticated()) {
+    window.location.href = '/login';
+  }
+
+  let expenses = [];
+  let incomes = [];
+  let methodChart = null;
+  let monthlyChart = null;
+  let currentPeriod = '6m'; // Default period
+
+  // Função para formatar moeda
+  function formatCurrency(value) {
+    return new Intl.NumberFormat('pt-BR', {
+      style: 'currency',
+      currency: 'BRL'
+    }).format(value);
+  }
+
+  // Função para formatar data
+  function formatDate(dateString) {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('pt-BR');
+  }
+
+  // Função para obter data atual no formato YYYY-MM-DD
+  function getTodayDate() {
+    const today = new Date();
+    return today.toISOString().split('T')[0];
+  }
+
+  // Carregar dados ao iniciar
+  async function init() {
+    document.getElementById('expense-date').value = getTodayDate();
+    document.getElementById('income-date').value = getTodayDate();
+    await loadExpenses();
+    await loadIncomes();
+    setPeriod('6m');  // Define período padrão e carrega análises
+  }
+
+  // Mudar abas
+  function switchTab(tabName) {
+    document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+    document.getElementById(tabName + '-tab').classList.add('active');
+    event.target.classList.add('active');
+
+    if (tabName === 'analytics') {
+      setTimeout(() => {
+        if (methodChart) methodChart.resize();
+        if (monthlyChart) monthlyChart.resize();
+      }, 100);
+    }
+  }
+
+  // Despesas
+  async function loadExpenses() {
+    try {
+      const res = await apiRequest('/treasury/expenses');
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.detail || 'Erro ao carregar despesas');
+      }
+      const data = await res.json();
+      if (Array.isArray(data)) {
+        expenses = data;
+      } else if (data && data.data) {
+        expenses = data.data;
+      }
+      renderExpenses();
+    } catch (err) {
+      console.error('Erro ao carregar despesas:', err);
+    }
+  }
+
+  function renderExpenses() {
+    const list = document.getElementById('expenses-list');
+    if (expenses.length === 0) {
+      list.innerHTML = '<div class="empty-state"><div class="empty-state-icon">📭</div><p>Nenhuma despesa registrada</p></div>';
+      return;
+    }
+
+    list.innerHTML = expenses.map(exp => `
+      <div class="item-card">
+        <div class="item-info">
+          <h4>${exp.name}</h4>
+          <p>📅 ${formatDate(exp.date)}</p>
+          <p>💳 ${getMethodLabel(exp.method)}</p>
+          ${exp.notes ? `<p>📝 ${exp.notes}</p>` : ''}
+        </div>
+        <div style="display: flex; align-items: center; gap: 1rem;">
+          <div class="item-value">${formatCurrency(exp.value)}</div>
+          <div class="item-actions">
+            <button class="btn-icon" onclick="editExpense(${exp.id})">✏️</button>
+            <button class="btn-icon delete" onclick="deleteExpense(${exp.id})">🗑️</button>
+          </div>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  function clearExpenseForm() {
+    document.getElementById('expense-name').value = '';
+    document.getElementById('expense-value').value = '';
+    document.getElementById('expense-date').value = getTodayDate();
+    document.getElementById('expense-method').value = 'card';
+    document.getElementById('expense-notes').value = '';
+  }
+
+  async function saveExpense() {
+    const name = document.getElementById('expense-name').value.trim();
+    const value = parseFloat(document.getElementById('expense-value').value);
+    const date = document.getElementById('expense-date').value;
+    const method = document.getElementById('expense-method').value;
+    const notes = document.getElementById('expense-notes').value.trim();
+
+    if (!name || !value || !date || value <= 0) {
+      alert('Preencha todos os campos obrigatórios');
+      return;
+    }
+
+    try {
+      await apiRequest('/treasury/expenses', {
+        method: 'POST',
+        body: JSON.stringify({
+          name,
+          value,
+          date: new Date(date).toISOString(),
+          method,
+          notes: notes || null
+        })
+      });
+      clearExpenseForm();
+      await loadExpenses();
+      await loadAnalytics();
+    } catch (err) {
+      alert('Erro ao salvar despesa: ' + err.message);
+    }
+  }
+
+  async function deleteExpense(id) {
+    if (!confirm('Tem certeza que deseja deletar esta despesa?')) return;
+    try {
+      await apiRequest(`/treasury/expenses/${id}`, { method: 'DELETE' });
+      await loadExpenses();
+      await loadAnalytics();
+    } catch (err) {
+      alert('Erro ao deletar despesa: ' + err.message);
+    }
+  }
+
+  // Receitas
+  async function loadIncomes() {
+    try {
+      const res = await apiRequest('/treasury/incomes');
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.detail || 'Erro ao carregar receitas');
+      }
+      const data = await res.json();
+      if (Array.isArray(data)) {
+        incomes = data;
+      } else if (data && data.data) {
+        incomes = data.data;
+      }
+      renderIncomes();
+    } catch (err) {
+      console.error('Erro ao carregar receitas:', err);
+    }
+  }
+
+  function renderIncomes() {
+    const list = document.getElementById('incomes-list');
+    if (incomes.length === 0) {
+      list.innerHTML = '<div class="empty-state"><div class="empty-state-icon">📭</div><p>Nenhuma receita registrada</p></div>';
+      return;
+    }
+
+    list.innerHTML = incomes.map(inc => `
+      <div class="item-card" style="border-left-color: var(--flower-yellow);">
+        <div class="item-info">
+          <h4>${inc.name}</h4>
+          <p>📅 ${formatDate(inc.date)}</p>
+          ${inc.notes ? `<p>📝 ${inc.notes}</p>` : ''}
+        </div>
+        <div style="display: flex; align-items: center; gap: 1rem;">
+          <div class="item-value" style="color: var(--flower-yellow);">${formatCurrency(inc.value)}</div>
+          <div class="item-actions">
+            <button class="btn-icon" onclick="editIncome(${inc.id})">✏️</button>
+            <button class="btn-icon delete" onclick="deleteIncome(${inc.id})">🗑️</button>
+          </div>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  function clearIncomeForm() {
+    document.getElementById('income-name').value = '';
+    document.getElementById('income-value').value = '';
+    document.getElementById('income-date').value = getTodayDate();
+    document.getElementById('income-notes').value = '';
+  }
+
+  async function saveIncome() {
+    const name = document.getElementById('income-name').value.trim();
+    const value = parseFloat(document.getElementById('income-value').value);
+    const date = document.getElementById('income-date').value;
+    const notes = document.getElementById('income-notes').value.trim();
+
+    if (!name || !value || !date || value <= 0) {
+      alert('Preencha todos os campos obrigatórios');
+      return;
+    }
+
+    try {
+      await apiRequest('/treasury/incomes', {
+        method: 'POST',
+        body: JSON.stringify({
+          name,
+          value,
+          date: new Date(date).toISOString(),
+          notes: notes || null
+        })
+      });
+      clearIncomeForm();
+      await loadIncomes();
+      await loadAnalytics();
+    } catch (err) {
+      alert('Erro ao salvar receita: ' + err.message);
+    }
+  }
+
+  async function deleteIncome(id) {
+    if (!confirm('Tem certeza que deseja deletar esta receita?')) return;
+    try {
+      await apiRequest(`/treasury/incomes/${id}`, { method: 'DELETE' });
+      await loadIncomes();
+      await loadAnalytics();
+    } catch (err) {
+      alert('Erro ao deletar receita: ' + err.message);
+    }
+  }
+
+  // Análises
+  function setPeriod(period) {
+    currentPeriod = period;
+    
+    // Update button styles
+    document.querySelectorAll('#analytics-tab .tab-btn').forEach(btn => {
+      btn.style.background = '#f0f0f0';
+      btn.style.color = 'var(--text-dark)';
+      btn.style.borderColor = '#ddd';
+    });
+    
+    const periodLabels = {
+      '1m': 'este mês',
+      '3m': 'últimos 3 meses',
+      '6m': 'últimos 6 meses',
+      '12m': 'últimos 12 meses'
+    };
+    
+    // Highlight current button
+    const btnId = `btn-${period}`;
+    const btn = document.getElementById(btnId);
+    if (btn) {
+      btn.style.background = '#E8F5E9';
+      btn.style.borderColor = 'var(--grass-green)';
+    }
+    
+    // Update labels - HEADER CARDS
+    const label = periodLabels[period] || 'últimos 6 meses';
+    document.querySelectorAll('[id^="header-period-label"]').forEach(el => {
+      el.textContent = `(${label})`;
+    });
+    
+    // Update labels - ANALYTICS CARDS
+    document.querySelectorAll('[id^="period-label"]').forEach(el => {
+      el.textContent = `(${label})`;  // Com parênteses
+    });
+    document.getElementById('monthly-period-label').textContent = label;
+    
+    loadAnalytics();
+  }
+
+  async function loadAnalytics() {
+    try {
+      const res = await apiRequest(`/treasury/analytics/summary?period=${currentPeriod}`);
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.detail || 'Erro ao carregar resumo');
+      }
+      const summary = await res.json();
+      if (summary) {
+        // Atualizar cards no topo
+        document.getElementById('expenses-total').textContent = formatCurrency(summary.expenses_total);
+        document.getElementById('incomes-total').textContent = formatCurrency(summary.incomes_total);
+        document.getElementById('balance-total').textContent = formatCurrency(summary.balance);
+        
+        // Atualizar cards na aba Analytics
+        document.getElementById('analytics-expenses-total').textContent = formatCurrency(summary.expenses_total);
+        document.getElementById('analytics-incomes-total').textContent = formatCurrency(summary.incomes_total);
+        document.getElementById('analytics-balance-total').textContent = formatCurrency(summary.balance);
+        
+        // Change balance color based on positive/negative - HEADER
+        const balanceEl = document.getElementById('balance-total');
+        if (summary.balance < 0) {
+          balanceEl.style.color = '#ff6b6b';
+        } else {
+          balanceEl.style.color = 'var(--flower-pink)';
+        }
+        
+        // Change balance color based on positive/negative - ANALYTICS
+        const analyticsBalanceEl = document.getElementById('analytics-balance-total');
+        if (summary.balance < 0) {
+          analyticsBalanceEl.style.color = '#ff6b6b';
+        } else {
+          analyticsBalanceEl.style.color = 'var(--flower-pink)';
+        }
+      }
+    } catch (err) {
+      console.error('Erro ao carregar resumo:', err);
+    }
+
+    await loadMethodChart();
+    await loadMonthlyChart();
+  }
+
+  async function loadMethodChart() {
+    try {
+      const res = await apiRequest(`/treasury/analytics/by-method?period=${currentPeriod}`);
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.detail || 'Erro ao carregar gráfico');
+      }
+      const data = await res.json();
+      if (data && Object.keys(data).length > 0) {
+        const labels = Object.keys(data).map(getMethodLabel);
+        const values = Object.values(data);
+        
+        const ctx = document.getElementById('methodChart');
+        if (methodChart) {
+          methodChart.destroy();
+        }
+
+        // Plugin para exibir valores nas fatias
+        const dataLabelsPlugin = {
+          id: 'dataLabels',
+          afterDatasetsDraw(chart) {
+            const canvasContext = chart.ctx;
+            const positions = []; // Array para rastrear posições dos textos
+            
+            chart.data.datasets.forEach((dataset, datasetIndex) => {
+              const meta = chart.getDatasetMeta(datasetIndex);
+              
+              // Verificar se o dataset está oculto (clicado na legenda)
+              if (meta.hidden) {
+                return; // Pular este dataset
+              }
+              
+              meta.data.forEach((datapoint, index) => {
+                const { x, y } = datapoint.tooltipPosition();
+                const value = dataset.data[index];
+                const label = formatCurrency(value);
+                
+                // Medir tamanho do texto para detecção de colisão
+                canvasContext.font = 'bold 11px Arial';
+                const metrics = canvasContext.measureText(label);
+                const textWidth = metrics.width;
+                const textHeight = 14; // Aproximado para 11px
+                
+                // Verificar colisão com textos anteriores
+                let finalY = y;
+                let collisionDetected = false;
+                
+                for (let pos of positions) {
+                  const distance = Math.abs(finalY - pos.y);
+                  if (distance < textHeight + 5 && Math.abs(x - pos.x) < textWidth + 10) {
+                    collisionDetected = true;
+                    // Mover para cima ou para baixo
+                    finalY = pos.y < y ? pos.y - (textHeight + 5) : pos.y + (textHeight + 5);
+                    break;
+                  }
+                }
+                
+                // Registrar posição do texto
+                positions.push({ x, y: finalY, width: textWidth, height: textHeight });
+                
+                // Desenhar com contorno preto para melhor visibilidade
+                canvasContext.fillStyle = 'black';
+                canvasContext.font = 'bold 11px Arial';
+                canvasContext.textAlign = 'center';
+                canvasContext.textBaseline = 'middle';
+                
+                // Desenhar contorno (shadow effect)
+                for (let i = -2; i <= 2; i++) {
+                  for (let j = -2; j <= 2; j++) {
+                    if (i !== 0 || j !== 0) {
+                      canvasContext.fillText(label, x + i, finalY + j);
+                    }
+                  }
+                }
+                
+                // Desenhar texto branco por cima
+                canvasContext.fillStyle = 'white';
+                canvasContext.fillText(label, x, finalY);
+              });
+            });
+          }
+        };
+
+        methodChart = new Chart(ctx, {
+          type: 'doughnut',
+          data: {
+            labels: labels,
+            datasets: [{
+              data: values,
+              backgroundColor: [
+                '#ff54a9',
+                '#FFD700',
+                '#9966CC',
+                '#fd6b36',
+                '#5FDD4D',
+                '#fd0389'
+              ],
+              borderColor: '#fff',
+              borderWidth: 2
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: {
+                position: 'bottom',
+                labels: {
+                  font: {
+                    size: 16,
+                    weight: 'bold'
+                  },
+                  padding: 20,
+                  usePointStyle: true,
+                  pointStyle: 'circle'
+                }
+              },
+              tooltip: {
+                callbacks: {
+                  label: function(context) {
+                    return context.label + ': ' + formatCurrency(context.parsed);
+                  }
+                }
+              }
+            }
+          },
+          plugins: [dataLabelsPlugin]
+        });
+      }
+    } catch (err) {
+      console.error('Erro ao carregar gráfico de métodos:', err);
+    }
+  }
+
+  async function loadMonthlyChart() {
+    try {
+      const res = await apiRequest(`/treasury/analytics/monthly?period=${currentPeriod}`);
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.detail || 'Erro ao carregar gráfico mensal');
+      }
+      const data = await res.json();
+      if (data && Object.keys(data).length > 0) {
+        const months = Object.keys(data).sort().slice(-12);
+        const expenses = months.map(m => data[m].expenses);
+        const incomes = months.map(m => data[m].incomes);
+
+        const ctx = document.getElementById('monthlyChart');
+        if (monthlyChart) {
+          monthlyChart.destroy();
+        }
+
+        monthlyChart = new Chart(ctx, {
+          type: 'bar',
+          data: {
+            labels: months.map(m => {
+              const [year, month] = m.split('-');
+              return new Date(year, parseInt(month) - 1).toLocaleDateString('pt-BR', { month: 'short', year: '2-digit' });
+            }),
+            datasets: [
+              {
+                label: 'Despesas',
+                data: expenses,
+                backgroundColor: '#ff54a9',
+                borderColor: '#ff54a9',
+                borderWidth: 1
+              },
+              {
+                label: 'Receitas',
+                data: incomes,
+                backgroundColor: '#FFD700',
+                borderColor: '#FFD700',
+                borderWidth: 1
+              }
+            ]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: {
+                display: true,
+                labels: {
+                  font: { size: 12 }
+                }
+              }
+            },
+            scales: {
+              y: {
+                beginAtZero: true,
+                ticks: {
+                  callback: function(value) {
+                    return 'R$ ' + value.toLocaleString('pt-BR');
+                  }
+                }
+              }
+            }
+          }
+        });
+      }
+    } catch (err) {
+      console.error('Erro ao carregar gráfico mensal:', err);
+    }
+  }
+
+  function getMethodLabel(method) {
+    const labels = {
+      'card': 'Cartão',
+      'cash': 'Dinheiro',
+      'transfer': 'Transferência',
+      'debit': 'Débito',
+      'pix': 'Pix',
+      'bill': 'Boleto'
+    };
+    return labels[method] || method;
+  }
+
+  function logout() {
+    clearToken();
+    window.location.href = '/';
+  }
+
+  function editExpense(id) {
+    const exp = expenses.find(e => e.id === id);
+    if (exp) {
+      document.getElementById('expense-name').value = exp.name;
+      document.getElementById('expense-value').value = exp.value;
+      document.getElementById('expense-date').value = exp.date.split('T')[0];
+      document.getElementById('expense-method').value = exp.method;
+      document.getElementById('expense-notes').value = exp.notes || '';
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  }
+
+  function editIncome(id) {
+    const inc = incomes.find(i => i.id === id);
+    if (inc) {
+      document.getElementById('income-name').value = inc.name;
+      document.getElementById('income-value').value = inc.value;
+      document.getElementById('income-date').value = inc.date.split('T')[0];
+      document.getElementById('income-notes').value = inc.notes || '';
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  }
+
+  // Inicializar
+  init();
+</script>
+{% endblock %}
