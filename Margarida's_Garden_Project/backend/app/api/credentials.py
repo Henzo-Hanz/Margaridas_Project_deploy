@@ -5,7 +5,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
 from app.core.database import get_db
-from app.core.auth import get_current_user
+from app.core.security import get_current_user
 from app.core.security import encrypt_password, decrypt_password
 from app.models.user import User
 from app.models.credential import Credential
@@ -15,13 +15,17 @@ router = APIRouter(prefix="/passwords", tags=["credentials"])
 
 
 def _credential_to_response(cred: Credential, show_password: bool = False) -> CredentialResponse:
-    """Converte model para schema, com senha mascarada ou real."""
-    pwd = decrypt_password(cred.encrypted_password) if show_password else "••••••••"
+    """Converte model para schema. Se client_encrypted, retorna blob; senão mascarada ou descriptografada."""
+    if cred.client_encrypted:
+        pwd = cred.encrypted_password if show_password else "••••••••"
+    else:
+        pwd = decrypt_password(cred.encrypted_password) if show_password else "••••••••"
     return CredentialResponse(
         id=cred.id,
         service_name=cred.service_name,
         username=cred.username,
         password=pwd,
+        client_encrypted=cred.client_encrypted,
         notes=cred.notes,
         created_at=cred.created_at,
     )
@@ -44,12 +48,21 @@ def create_credential(
     current_user: Annotated[User, Depends(get_current_user)],
     db: Annotated[Session, Depends(get_db)],
 ):
-    """Adiciona nova credencial."""
+    """Adiciona nova credencial. Zero Knowledge: password_encrypted. Legacy: password."""
+    if data.password_encrypted is not None:
+        encrypted_pwd = data.password_encrypted
+        client_encrypted = True
+    elif data.password is not None:
+        encrypted_pwd = encrypt_password(data.password)
+        client_encrypted = False
+    else:
+        raise HTTPException(status_code=400, detail="Informe password ou password_encrypted")
     cred = Credential(
         user_id=current_user.id,
         service_name=data.service_name,
         username=data.username,
-        encrypted_password=encrypt_password(data.password),
+        encrypted_password=encrypted_pwd,
+        client_encrypted=client_encrypted,
         notes=data.notes,
     )
     db.add(cred)
@@ -94,8 +107,12 @@ def update_credential(
         cred.service_name = data.service_name
     if data.username is not None:
         cred.username = data.username
-    if data.password is not None:
+    if data.password_encrypted is not None:
+        cred.encrypted_password = data.password_encrypted
+        cred.client_encrypted = True
+    elif data.password is not None:
         cred.encrypted_password = encrypt_password(data.password)
+        cred.client_encrypted = False
     if data.notes is not None:
         cred.notes = data.notes
     db.commit()

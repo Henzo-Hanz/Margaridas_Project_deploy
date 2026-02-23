@@ -23,6 +23,18 @@ class UserResponse(BaseModel):
         from_attributes = True
 
 
+class UserMeResponse(BaseModel):
+    """Schema para /me - usuário atual com encryption_salt para Zero Knowledge."""
+
+    id: int
+    name: str
+    email: str
+    encryption_salt: str | None
+
+    class Config:
+        from_attributes = True
+
+
 class Token(BaseModel):
     """Schema de token JWT."""
 

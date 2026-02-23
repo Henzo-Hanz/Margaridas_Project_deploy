@@ -47,19 +47,23 @@ async function apiRequest(path, options = {}) {
     ...(token && { Authorization: `Bearer ${token}` }),
     ...options.headers,
   };
-  
+
   const res = await fetch(`${API_BASE}${path}`, { ...options, headers });
-  
+
   if (res.status === 401) {
     clearToken();
     window.location.href = '/login';
     throw new Error('Sessão expirada');
   }
-  
-  // Retornar o objeto Response completo para que quem chamar possa lidar com status e conteúdo
+
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.detail || `Erro ${res.status}`);
+  }
+
   return {
     status: res.status,
-    ok: res.ok,
+    ok: true,
     json: () => res.json(),
   };
 }

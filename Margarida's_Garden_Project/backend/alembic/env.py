@@ -12,7 +12,7 @@ from sqlalchemy.pool import NullPool
 from alembic import context
 
 from app.core.database import Base
-from app.core.config import DATABASE_URL
+from app.core.config import settings
 from app.models import User, Credential
 
 config = context.config
@@ -20,7 +20,7 @@ if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
 target_metadata = Base.metadata
-config.set_main_option("sqlalchemy.url", DATABASE_URL.replace("%", "%%"))
+config.set_main_option("sqlalchemy.url", settings.DATABASE_URL.replace("%", "%%"))
 
 
 def run_migrations_offline() -> None:

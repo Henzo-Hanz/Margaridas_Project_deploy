@@ -1,0 +1,10 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply min-h-screen overflow-x-hidden font-sans;
+    background: linear-gradient(180deg, #F0F9FC 0%, #E0F2F7 60%, #D8F0D0 90%, #5FDD4D 100%);
+  }
+}

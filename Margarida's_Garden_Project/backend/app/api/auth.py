@@ -1,23 +1,25 @@
 """Endpoints de autenticação."""
+from datetime import timedelta
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Request, status
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 
+from app.core.config import settings
 from app.core.database import get_db
-from app.core.security import verify_password, get_password_hash, create_access_token
-from datetime import timedelta
-
-from app.core.config import ACCESS_TOKEN_EXPIRE_MINUTES
+from app.core.rate_limit import limiter
+from app.core.security import create_access_token, get_current_user, get_password_hash, verify_password
 from app.models.user import User
-from app.schemas.user import Token, UserCreate, UserResponse
+from app.schemas.user import Token, UserCreate, UserMeResponse, UserResponse
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
 
 @router.post("/login", response_model=Token)
+@limiter.limit("5/minute")
 def login(
+    request: Request,
     form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
     db: Annotated[Session, Depends(get_db)],
 ):
@@ -30,9 +32,25 @@ def login(
         )
     access_token = create_access_token(
         data={"sub": str(user.id), "email": user.email},
-        expires_delta=timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES),
+        expires_delta=timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES),
     )
     return Token(access_token=access_token)
+
+
+@router.get("/me", response_model=UserMeResponse)
+def get_me(
+    current_user: Annotated[User, Depends(get_current_user)],
+    db: Annotated[Session, Depends(get_db)],
+):
+    """Retorna usuário atual com encryption_salt (Zero Knowledge)."""
+    current_user.ensure_encryption_salt()
+    db.commit()
+    return UserMeResponse(
+        id=current_user.id,
+        name=current_user.name,
+        email=current_user.email,
+        encryption_salt=current_user.encryption_salt,
+    )
 
 
 @router.post("/register", response_model=UserResponse)

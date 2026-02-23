@@ -77,22 +77,19 @@
     window.location.href = '/';
   }
 
-  // Carregar dados financeiros se quiser mostrar (opcional)
   async function loadStats() {
     try {
-      const response = await apiRequest('/treasury/analytics/summary');
-      if (response && response.data) {
-        document.getElementById('quick-stats').style.display = 'grid';
-        document.getElementById('expenses-3m').textContent = `R$ ${response.data.expenses.total_3m.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
-        document.getElementById('incomes-3m').textContent = `R$ ${response.data.incomes.total_3m.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
-        document.getElementById('balance-3m').textContent = `R$ ${response.data.balance.balance_3m.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
-      }
+      const response = await apiRequest('/treasury/analytics/summary?period=3m');
+      const data = await response.json();
+      document.getElementById('quick-stats').style.display = 'grid';
+      document.getElementById('expenses-3m').textContent = 'R$ ' + (data.expenses_total ?? 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+      document.getElementById('incomes-3m').textContent = 'R$ ' + (data.incomes_total ?? 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+      document.getElementById('balance-3m').textContent = 'R$ ' + (data.balance ?? 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 });
     } catch (err) {
       console.error('Erro ao carregar estatísticas:', err);
     }
   }
 
-  // Remover a chamada a loadStats por enquanto (pode ser adicionada após implementar melhor)
-  // loadStats();
+  loadStats();
 </script>
 {% endblock %}

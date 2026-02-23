@@ -6,11 +6,12 @@ from pydantic import BaseModel
 
 
 class CredentialCreate(BaseModel):
-    """Schema para criar credencial."""
+    """Schema para criar credencial. Zero Knowledge: use password_encrypted. Legacy: use password."""
 
     service_name: str
     username: Optional[str] = None
-    password: str
+    password: Optional[str] = None  # Legacy - servidor criptografa
+    password_encrypted: Optional[str] = None  # Zero Knowledge - blob base64 já criptografado no cliente
     notes: Optional[str] = None
 
 
@@ -19,17 +20,19 @@ class CredentialUpdate(BaseModel):
 
     service_name: Optional[str] = None
     username: Optional[str] = None
-    password: Optional[str] = None
+    password: Optional[str] = None  # Legacy
+    password_encrypted: Optional[str] = None  # Zero Knowledge
     notes: Optional[str] = None
 
 
 class CredentialResponse(BaseModel):
-    """Schema de resposta - senha mascarada por padrão."""
+    """Schema de resposta. password: mascarada, real (legacy) ou blob base64 (client_encrypted)."""
 
     id: int
     service_name: str
     username: Optional[str] = None
-    password: str  # Pode ser mascarada ou descriptografada conforme contexto
+    password: str
+    client_encrypted: bool = False
     notes: Optional[str] = None
     created_at: datetime
 

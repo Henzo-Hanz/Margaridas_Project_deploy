@@ -237,6 +237,5 @@ Para dúvidas, consulte os documentos:
 - ATUALIZACOES_v2.md
 
 ---
-
-**Desenvolvido com 💜 para Margarida**  
+ 
 **Versão 2.0.0 - Fevereiro 2026**

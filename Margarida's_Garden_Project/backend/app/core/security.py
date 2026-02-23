@@ -12,7 +12,7 @@ from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 from jose import JWTError, jwt
 from passlib.context import CryptContext
 
-from app.core.config import SECRET_KEY, ALGORITHM
+from app.core.config import settings
 
 # Contexto para hash de senhas de usuário
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
@@ -33,13 +33,13 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta] = None) -
     to_encode = data.copy()
     expire = datetime.utcnow() + (expires_delta or timedelta(minutes=60))
     to_encode.update({"exp": expire})
-    return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+    return jwt.encode(to_encode, settings.SECRET_KEY, algorithm=settings.ALGORITHM)
 
 
 def decode_token(token: str) -> Optional[dict]:
     """Decodifica e valida token JWT."""
     try:
-        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
         return payload
     except JWTError:
         return None
@@ -53,7 +53,7 @@ def _get_encryption_key() -> bytes:
         salt=b"margarida_garden_salt",
         iterations=100000,
     )
-    key = base64.urlsafe_b64encode(kdf.derive(SECRET_KEY.encode()))
+    key = base64.urlsafe_b64encode(kdf.derive(settings.SECRET_KEY.encode()))
     return key
 
 

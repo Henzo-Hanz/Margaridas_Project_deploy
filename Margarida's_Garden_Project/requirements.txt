@@ -23,6 +23,10 @@ cryptography==42.0.2
 
 # Variáveis de ambiente
 python-dotenv==1.0.1
+pydantic-settings>=2.0.0
+
+# Rate limiting
+slowapi>=0.1.9
 
 # Testes
 pytest>=7.0.0,<8
