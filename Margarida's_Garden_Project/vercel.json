@@ -2,14 +2,14 @@
   "version": 2,
   "buildCommand": "cd frontend && npm install && npm run build",
   "outputDirectory": "frontend/dist",
-  "framework": null,
+  "framework": "vite",
   "rewrites": [
-    { "source": "/api/(.*)", "destination": "/api/index" },
+    { "source": "/api/(.*)", "destination": "/api/index.py" },
     { "source": "/(.*)", "destination": "/index.html" }
   ],
   "functions": {
     "api/index.py": {
-      "runtime": "python@3.9"
+      "runtime": "python3.9"
     }
   }
 }
