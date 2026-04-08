@@ -47,7 +47,6 @@ Acesse: **http://localhost:8000**
 
 ## Funcionalidades
 
-- Landing page com animação de flores e pétalas
 - Login com JWT
 - CRUD de senhas (adicionar, editar, excluir, listar)
 - Senhas criptografadas no banco
